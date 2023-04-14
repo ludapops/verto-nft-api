@@ -3,6 +3,8 @@ import attributeSchema from "./schemas/attribute.schema";
 import collectionSchema from "./schemas/collection.schema";
 import metadataSchema from "./schemas/metadata.schema";
 import tokenSchema from "./schemas/token.schema";
+import dotenv from "dotenv";
+dotenv.config();
 
 let connection: Connection | null = null;
 
@@ -14,6 +16,7 @@ export const getConnection = async (): Promise<Connection> => {
   if (connection === null) {
     /* istanbul ignore next */
     const uri = process.env.MONGO_URI ?? "mongodb://localhost:27017/marketplace";
+
     connection = mongoose.createConnection(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
