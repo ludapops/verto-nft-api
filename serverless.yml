@@ -7,7 +7,7 @@ provider:
   region: ${opt:region, 'us-east-1'}
   environment:
     PANCAKE_BUNNY_ADDRESS: 'your-pancake-bunny-address'
-    MONGO_URI: 'mongodb+srv://Cluster07966:b3x1UUtRREpy@cluster07966.xc2mdnk.mongodb.net/verto_trade_testing?retryWrites=true&w=majority'
+    MONGO_URI: 'mongodb+srv://marcm:Paris2007@cluster0.qg8k2ln.mongodb.net/nft_collections?retryWrites=true&w=majority'
 
 functions:
   getAttributesDistribution:
@@ -66,4 +66,5 @@ functions:
           cors: true
 
 plugins:
+  - serverless-plugin-typescript
   - serverless-offline
