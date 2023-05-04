@@ -12,7 +12,7 @@ import { Attribute, Collection, Token } from "../../../utils/types";
 import forEach from "lodash/forEach";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const address = event.queryStringParameters?.address as string;
+  const address = event.pathParameters?.address as string;
 
   if (event.httpMethod?.toUpperCase() === "OPTIONS") {
     return {

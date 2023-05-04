@@ -27,7 +27,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     };
   }
 
-  const { address, id } = event.queryStringParameters;
+  const { address, id } = event.pathParameters;
 
   if (address && isAddress(address) && id) {
     try {
