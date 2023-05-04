@@ -1,4 +1,4 @@
-import mongoose, { Connection, Model } from "mongoose";
+import mongoose, { Connection, PaginateModel } from "mongoose";
 import attributeSchema from "./schemas/attribute.schema";
 import collectionSchema from "./schemas/collection.schema";
 import metadataSchema from "./schemas/metadata.schema";
@@ -36,8 +36,8 @@ export const getConnection = async (): Promise<Connection> => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getModel = async (name: string): Promise<Model<any>> => {
+export const getModel = async (name: string): Promise<PaginateModel<any, any, any>> => {
   connection = await getConnection();
 
-  return connection.model(name);
+  return connection.model(name) as any;
 };

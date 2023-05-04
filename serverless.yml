@@ -7,7 +7,7 @@ provider:
   region: ${opt:region, 'us-east-1'}
   environment:
     PANCAKE_BUNNY_ADDRESS: 'your-pancake-bunny-address'
-    MONGO_URI: 'mongodb+srv://marcm:Paris2007@cluster0.qg8k2ln.mongodb.net/nft_collections?retryWrites=true&w=majority'
+    MONGO_URI: 'mongodb+srv://higor:956tD44DkIfdh2u2@cluster0.4igvt9x.mongodb.net/publish-nft-db?retryWrites=true&w=majority'
 
 functions:
   getAttributesDistribution:
@@ -19,13 +19,14 @@ functions:
           cors: true
   getCollection:
     handler: src/handlers/getCollections.handler
+    timeout: 10
     events:
       - http:
           path: /collections
           method: get
           cors: true
   getCollectionByAddress:
-    handler: src/handlers/getCollectionByAddress.handler
+    handler: src/handlers/getCollectionsByAddress.handler
     events:
       - http:
           path: /collection/{address}
