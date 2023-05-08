@@ -1,10 +1,10 @@
-# PancakeSwap NFT Marketplace API
+# Verto NFT Marketplace API
 
-Serverless API implementation for PancakeSwap NFT Marketplace
+Serverless API implementation for Verto NFT Marketplace
 
 # Dependencies
 
-- [Vercel CLI](https://vercel.com/download)
+- [Serverless CLI](https://www.serverless.com/framework/docs)
   - Required to emulate local environment (serverless).
 
 # Configuration
@@ -20,10 +20,15 @@ export MONGO_URI = "mongodb://host:port/database";
 
 # Development
 
+```shell
+yarn start
+```
+
+
 ## Install requirements
 
 ```shell
-yarn global add vercel
+yarn global add serverless
 ```
 
 ## Build
@@ -33,14 +38,10 @@ yarn global add vercel
 yarn
 
 # Build project
-vercel dev
+yarn start
 ```
 
-Endpoints are based on filename inside the `api/` folder.
-
-```shell
-# api/version.ts
-curl -X GET 'localhost:3000/api/version'
+Endpoints are based on filename inside the `src/handler` folder.
 
 # ...
 ```
@@ -54,5 +55,5 @@ Deploy to production should be triggered by a webhook when a commit, or a pull-r
 If you need to force a deployment, use the following command:
 
 ```shell
-vercel --prod
+serverless deploy
 ```
