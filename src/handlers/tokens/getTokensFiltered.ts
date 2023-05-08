@@ -1,7 +1,17 @@
 /* This file defines an API endpoint that takes an NFT collection's contract address, 
  filter parameters, and optional pagination parameters (page and size) as input. 
  The main goal of this endpoint is to retrieve and return information about the tokens
-  within the specified collection, based on the provided filter parameters. */
+  within the specified collection, based on the provided filter parameters. 
+
+  The main handler function checks if the provided address is valid, retrieves the NFT collection with the specified contract address,
+  and constructs a filter query based on the provided query string parameters.
+  It then fetches the attributes and tokens that match the filter query, applying pagination as needed.
+
+  To make a request to this API endpoint, you'll need to know the base URL where your API is hosted,
+  the contract address of the NFT collection, and the filter parameters you want to apply.
+  The request format would look like this: {BASE_URL}/dev/tokens/filtered/{contract_address}?Artist=John%20Smith
+  
+*/
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { getAddress, isAddress } from "ethers/lib/utils";
@@ -75,8 +85,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       const tokens = await tokenModel.paginate(
         { parent_collection: collection, attributes: { $all: attributes.map((obj) => obj._id) } },
         {
-          page: event.queryStringParameters.page ? parseInt(event.queryStringParameters.page as string, 10) : 1,
-          limit: event.queryStringParameters.size ? parseInt(event.queryStringParameters.size as string, 10) : 1000,
+          page: event.queryStringParameters?.page ? parseInt(event.queryStringParameters?.page as string, 10) : 1,
+          limit: event.queryStringParameters?.size ? parseInt(event.queryStringParameters?.size as string, 10) : 1000,
           sort: { token_id: "asc" },
           populate: ["metadata", "attributes"],
           collation: { locale: "en_US", numericOrdering: true },

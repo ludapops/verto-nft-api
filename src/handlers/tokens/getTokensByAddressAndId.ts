@@ -3,6 +3,10 @@
     It checks whether the NFT token exists in the database; if not,
     it fetches the token details from the blockchain using the contract address and token ID,
     then returns the token data as a JSON response.
+
+    To make a request to this API endpoint, you'll need to know the base URL where your API is hosted,
+    the contract address of the NFT collection, and the token ID of the specific NFT you want to fetch information about.
+    The request format would look like this: GET {BASE_URL}/tokens/{contract_address}/{token_id}
 */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
@@ -27,7 +31,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     };
   }
 
-  const { address, id } = event.pathParameters;
+  const address = event.pathParameters?.address ?? "";
+  const id = event.pathParameters?.id ?? ""; // This is the token_id
 
   if (address && isAddress(address) && id) {
     try {

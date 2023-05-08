@@ -1,3 +1,13 @@
+/*
+This endpoint checks if the requested collection's contract address matches the Pancake Bunnies address.
+If it does, it uses the fetchPancakeBunnies function; otherwise, it uses fetchGeneric.
+The handler returns the calculated attribute distribution data as a JSON response.
+
+To make a request to this API endpoint, you'll need to know the base URL where your API is hosted
+and the contract address of the NFT collection. The request format would look like this: 
+GET {BASE_URL}/tokens/distribution/{contract_address}
+*/
+
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { isAddress } from "ethers/lib/utils";
 import get from "lodash/get";
@@ -86,7 +96,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     };
   }
 
-  const address = event.queryStringParameters?.address;
+  const address = event.pathParameters?.address;
 
   if (address && isAddress(address)) {
     const collectionModel = await getModel("Collection");

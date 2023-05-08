@@ -178,13 +178,13 @@ const handler: APIGatewayProxyHandler = async (event, context) => {
     };
   }
 
-  const address = event.queryStringParameters?.address;
+  const address = event.pathParameters?.address;
 
   if (address && isAddress(address)) {
     const collectionModel = await getModel("Collection");
     const collection: Collection = await collectionModel.findOne({ address: address.toLowerCase() }).exec();
     if (!collection) {
-      return event.queryStringParameters.status(404).json({ error: { message: "Entity not found." } });
+      return event.queryStringParameters?.status(404).json({ error: { message: "Entity not found." } });
     }
 
     const { data, attributesDistribution } =

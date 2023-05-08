@@ -12,15 +12,15 @@ provider:
 functions:
   getAttributesDistribution:
     handler: src/handlers/getDistributions.handler
-    timeout: 10
+    timeout: 15
     events:
       - http:
-          path: /attributes/distribution
+          path: /attributes/distribution/{address}
           method: get
           cors: true
   getCollection:
     handler: src/handlers/getCollections.handler
-    timeout: 10
+    timeout: 15
     events:
       - http:
           path: /collections
@@ -28,7 +28,7 @@ functions:
           cors: true
   getCollectionByAddress:
     handler: src/handlers/getCollectionsByAddress.handler
-    timeout: 10
+    timeout: 15
     events:
       - http:
           path: /collection/{address}
@@ -36,7 +36,7 @@ functions:
           cors: true
   getTokensByAddressAndId:
     handler: src/handlers/tokens/getTokensByAddressAndId.handler
-    timeout: 10
+    timeout: 15
     events:
       - http:
           path: tokens/{address}/{id}
@@ -49,7 +49,7 @@ functions:
                 id: true
   getTokensFiltered:
     handler: src/handlers/tokens/getTokensFiltered.handler
-    timeout: 10
+    timeout: 15
     events:
       - http:
           path: tokens/filtered/{address}
@@ -64,10 +64,10 @@ functions:
                 size: false
   getTokens:
     handler: src/handlers/tokens/getTokens.handler
-    timeout: 10
+    timeout: 15
     events:
       - http:
-          path: /tokens
+          path: /tokens/{address}
           method: get
           cors: true
 
