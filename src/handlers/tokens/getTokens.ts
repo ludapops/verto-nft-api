@@ -6,8 +6,6 @@ import { Attribute, Token, Collection } from "../../../utils/types";
 import { getModel } from "../../../utils/mongo";
 import { paramCase } from "param-case";
 
-const PANCAKE_BUNNY_ADDRESS = process.env.PANCAKE_BUNNY_ADDRESS as string;
-
 /**
  * Fetch tokens from a generic collection
  * @param collection
@@ -83,90 +81,6 @@ const fetchGeneric = async (collection: Collection, page: number, size: number) 
   return { data, attributesDistribution };
 };
 
-/**
- * Fetch tokens from the pancake bunnies collection
- * @param collection
- * @returns
- */
-const fetchPancakeBunnies = async (collection: Collection) => {
-  const attributeModel = await getModel("Attribute");
-  const attributes: Attribute[] = await attributeModel
-    .find({ parent_collection: collection })
-    .sort({ value: "asc" })
-    .collation({ locale: "en_US", numericOrdering: true })
-    .exec();
-
-  const tokenModel = await getModel("Token");
-  const promisesTokens = attributes.map(async (attribute) => {
-    const res: Token = await tokenModel
-      .findOne({ parent_collection: collection, attributes: attribute })
-      .populate(["metadata", "attributes"])
-      .exec();
-
-    if (!res) {
-      return null;
-    }
-
-    const metaName = paramCase(res.metadata.name);
-    return {
-      name: res.metadata.name,
-      description: res.metadata.description,
-      image: {
-        original: `${CONTENT_DELIVERY_NETWORK_URI}/${NETWORK}/${getAddress(PANCAKE_BUNNY_ADDRESS)}/${metaName}.png`,
-        thumbnail: `${CONTENT_DELIVERY_NETWORK_URI}/${NETWORK}/${getAddress(
-          PANCAKE_BUNNY_ADDRESS
-        )}/${metaName}-1000.png`,
-        mp4: res.metadata.mp4
-          ? `${CONTENT_DELIVERY_NETWORK_URI}/${NETWORK}/${getAddress(PANCAKE_BUNNY_ADDRESS)}/${metaName}.mp4`
-          : null,
-        webm: res.metadata.webm
-          ? `${CONTENT_DELIVERY_NETWORK_URI}/${NETWORK}/${getAddress(PANCAKE_BUNNY_ADDRESS)}/${metaName}.webm`
-          : null,
-        gif: res.metadata.gif
-          ? `${CONTENT_DELIVERY_NETWORK_URI}/${NETWORK}/${getAddress(PANCAKE_BUNNY_ADDRESS)}/${metaName}.gif`
-          : null,
-      },
-      collection: {
-        name: collection.name,
-      },
-    };
-  });
-  const tokens = await Promise.all(promisesTokens);
-
-  const data: { [key: string]: Token } = attributes.reduce((acc, attribute: Attribute) => {
-    const bunnyId = parseInt(attribute.value, 10);
-    const token = tokens[bunnyId];
-    return {
-      ...acc,
-      [bunnyId]: token,
-    };
-  }, {});
-
-  const promisesAttributesDistribution = attributes.map(async (attribute: Attribute) => {
-    return await tokenModel
-      .aggregate([
-        {
-          $match: {
-            parent_collection: collection._id,
-            attributes: attribute._id,
-            burned: false,
-          },
-        },
-      ])
-      .count("token_id")
-      .exec();
-  });
-  const attributesDistribution = await Promise.all(promisesAttributesDistribution);
-
-  return {
-    data,
-    attributesDistribution: attributesDistribution.reduce(
-      (acc, value, index) => ({ ...acc, [index]: value[0] ? value[0].token_id : 0 }),
-      {}
-    ),
-  };
-};
-
 const handler: APIGatewayProxyHandler = async (event, context) => {
   if (event.httpMethod?.toUpperCase() === "OPTIONS") {
     return {
@@ -187,14 +101,11 @@ const handler: APIGatewayProxyHandler = async (event, context) => {
       return event.queryStringParameters?.status(404).json({ error: { message: "Entity not found." } });
     }
 
-    const { data, attributesDistribution } =
-      address.toLowerCase() === PANCAKE_BUNNY_ADDRESS?.toLowerCase()
-        ? await fetchPancakeBunnies(collection)
-        : await fetchGeneric(
-            collection,
-            event.queryStringParameters?.page ? parseInt(event.queryStringParameters.page, 10) : 1,
-            event.queryStringParameters?.size ? parseInt(event.queryStringParameters.size, 10) : 10000
-          );
+    const { data, attributesDistribution } = await fetchGeneric(
+      collection,
+      event.queryStringParameters?.page ? parseInt(event.queryStringParameters.page, 10) : 1,
+      event.queryStringParameters?.size ? parseInt(event.queryStringParameters.size, 10) : 10000
+    );
 
     const total = Object.keys(data).length;
 

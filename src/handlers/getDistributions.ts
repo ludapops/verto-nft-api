@@ -11,10 +11,8 @@ GET {BASE_URL}/tokens/distribution/{contract_address}
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { isAddress } from "ethers/lib/utils";
 import get from "lodash/get";
-import { Attribute, Token, Collection } from "../../utils/types";
+import { Token, Collection } from "../../utils/types";
 import { getModel } from "../../utils/mongo";
-
-const PANCAKE_BUNNY_ADDRESS = process.env.PANCAKE_BUNNY_ADDRESS as string;
 
 /**
  * Fetch tokens from a generic collection
@@ -46,44 +44,6 @@ const fetchGeneric = async (collection: Collection) => {
   return { attributesDistribution };
 };
 
-/**
- * Fetch tokens from the pancake bunnies collection
- * @param collection
- * @returns
- */
-const fetchPancakeBunnies = async (collection: Collection) => {
-  const attributeModel = await getModel("Attribute");
-  const attributes: Attribute[] = await attributeModel
-    .find({ parent_collection: collection })
-    .sort({ value: "asc" })
-    .collation({ locale: "en_US", numericOrdering: true })
-    .exec();
-
-  const tokenModel = await getModel("Token");
-  const promisesAttributesDistribution = attributes.map(async (attribute: Attribute) => {
-    return await tokenModel
-      .aggregate([
-        {
-          $match: {
-            parent_collection: collection._id,
-            attributes: attribute._id,
-            burned: false,
-          },
-        },
-      ])
-      .count("token_id")
-      .exec();
-  });
-  const attributesDistribution = await Promise.all(promisesAttributesDistribution);
-
-  return {
-    attributesDistribution: attributesDistribution.reduce(
-      (acc, value, index) => ({ ...acc, [index]: value[0] ? value[0].token_id : 0 }),
-      {}
-    ),
-  };
-};
-
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod?.toUpperCase() === "OPTIONS") {
     return {
@@ -112,10 +72,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       };
     }
 
-    const { attributesDistribution } =
-      address.toLowerCase() === PANCAKE_BUNNY_ADDRESS?.toLowerCase()
-        ? await fetchPancakeBunnies(collection)
-        : await fetchGeneric(collection);
+    const { attributesDistribution } = await fetchGeneric(collection);
 
     return {
       statusCode: 200,
