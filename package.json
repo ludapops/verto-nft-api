@@ -11,8 +11,7 @@
     "format:write": "prettier --write '*/**/*.{js,ts}'",
     "lint": "eslint '*/**/*.{js,ts}'",
     "prepare": "husky install",
-    "start": "serverless offline start",
-    "seed": "MONGO_URI = 'mongodb+srv://higor:956tD44DkIfdh2u2@cluster0.4igvt9x.mongodb.net/publish-nft-db?retryWrites=true&w=majority' ts-node ./seed.ts"
+    "start": "serverless offline start"
   },
   "dependencies": {
     "@types/lodash": "^4.14.173",
